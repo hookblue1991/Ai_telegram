@@ -14,11 +14,11 @@ client = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
 print("Bot started successfully!")
 
-# رویداد برای فوروارد کردن پیام‌ها از کانال‌های منبع به کانال مقصد
+# رویداد برای دریافت و فوروارد کردن پیام‌ها
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def forward_message(event):
     try:
-        print(f"New message received in {event.chat_id}: {event.message.text}")
+        print(f"New message received from {event.chat_id}: {event.message.text}")
         await client.send_message(TARGET_CHANNEL, event.message)
         print(f"Message forwarded to {TARGET_CHANNEL}")
     except Exception as e:
