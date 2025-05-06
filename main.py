@@ -2,7 +2,7 @@ import os
 from telethon import TelegramClient, events
 from flask import Flask
 
-# متغیرهای محیطی که از Render یا فایل .env خوانده می‌شوند
+# متغیرهای محیطی
 API_ID = int(os.getenv("API_ID"))
 API_HASH = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -18,8 +18,9 @@ print("Bot started successfully!")
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def forward_message(event):
     try:
+        print(f"New message received in {event.chat_id}: {event.message.text}")
         await client.send_message(TARGET_CHANNEL, event.message)
-        print(f"Message forwarded from {event.chat_id} to {TARGET_CHANNEL}")
+        print(f"Message forwarded to {TARGET_CHANNEL}")
     except Exception as e:
         print(f"Error while forwarding message: {e}")
 
