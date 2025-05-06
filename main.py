@@ -10,9 +10,16 @@ SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS").split(",")  # لیست کانال
 TARGET_CHANNEL = os.getenv("TARGET_CHANNEL")  # کانال مقصد
 
 # ایجاد کلاینت تلگرام
-client = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+client = TelegramClient('bot', API_ID, API_HASH)
 
-print("Bot started successfully!")
+async def start_bot():
+    try:
+        # بررسی اگر بات قبلاً وارد شده باشد
+        if not await client.is_user_authorized():
+            await client.start(bot_token=BOT_TOKEN)
+        print("Bot started successfully!")
+    except Exception as e:
+        print(f"Error during bot startup: {e}")
 
 # رویداد برای دریافت و فوروارد کردن پیام‌ها
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
@@ -36,5 +43,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
-    # اجرای تلگرام کلاینت تا زمانی که قطع شود
-    client.run_until_disconnected()
+    # اجرای کلاینت تلگرام
+    with client:
+        client.loop.run_until_complete(start_bot())
+        client.run_until_disconnected()
