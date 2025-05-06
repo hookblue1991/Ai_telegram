@@ -1,6 +1,8 @@
 import os
 from telethon import TelegramClient, events
+from telethon.errors import FloodWaitError
 from flask import Flask
+import asyncio
 
 # متغیرهای محیطی
 API_ID = int(os.getenv("API_ID"))
@@ -9,8 +11,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS").split(",")  # لیست کانال‌های منبع
 TARGET_CHANNEL = os.getenv("TARGET_CHANNEL")  # کانال مقصد
 
-# ایجاد کلاینت تلگرام
-client = TelegramClient('bot', API_ID, API_HASH)
+# ایجاد کلاینت تلگرام با استفاده از فایل سشن
+client = TelegramClient('bot.session', API_ID, API_HASH)
 
 async def start_bot():
     try:
@@ -18,6 +20,10 @@ async def start_bot():
         if not await client.is_user_authorized():
             await client.start(bot_token=BOT_TOKEN)
         print("Bot started successfully!")
+    except FloodWaitError as e:
+        print(f"Flood wait error: Waiting for {e.seconds} seconds.")
+        await asyncio.sleep(e.seconds)  # صبر تا پایان محدودیت
+        await start_bot()  # تلاش مجدد برای ورود
     except Exception as e:
         print(f"Error during bot startup: {e}")
 
